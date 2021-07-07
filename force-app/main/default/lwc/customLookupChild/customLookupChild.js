@@ -15,6 +15,7 @@ export default class CustomLookup extends LightningElement {
     searchTerm;
     results;
     showResults;
+    timeOutVar;
     /**
      * formats the results into a generic list 
      * with parameters like mainfieldtoshow and addnfieldtoshow
@@ -44,6 +45,7 @@ export default class CustomLookup extends LightningElement {
         if (this.searchTerm == '') {
             return 'SELECT Id,' + this.mainFieldToShow + ',' + this.addnFieldToShow + ' from ' + this.objectName + ' where ' + this.whereClause + ' limit ' + this.numberOfResults;
         } else {
+
             return 'FIND \'' + this.searchTerm + '\' IN ALL FIELDS RETURNING ' + this.objectName + '(Id,' + this.mainFieldToShow + ',' + this.addnFieldToShow + ' WHERE ' + this.whereClause + ')';
         }
     }
@@ -52,39 +54,23 @@ export default class CustomLookup extends LightningElement {
         this.__mouseUpListener = this.mouseUpListener.bind(this);
         window.addEventListener('click', this.__mouseUpListener);
         this.showResults = false;
-        if (this.searchTerm == '' || this.searchTerm == undefined) {
-            fetch({ 'query': this.formattedQuery, 'objectName': this.objectName })
-                .then(result => {
-                    console.log(result);
-                    let resultVar = JSON.parse(result);
-                    this.results = resultVar.returnValue.searchResults;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        } else {
-            search({ 'query': this.formattedQuery, 'objectName': this.objectName })
-                .then(result => {
-                    console.log(result);
-                    let resultVar = JSON.parse(result);
-                    this.results = resultVar.returnValue.searchResults;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        }
+        this.fetchResults();
     }
     mouseUpListener() {
-            console.log('logged in func');
-            this.showResults = false;
+        console.log('logged in func');
+        if(this.timeOutVar)
+        {
+            clearTimeout(this.timeOutVar);
         }
-        /**
-         * 
-         * @param {event} e 
-         * selects the record
-         * passes the selected record to parent
-         * closes the results
-         */
+        this.showResults = false;
+    }
+    /**
+     * 
+     * @param {event} e 
+     * selects the record
+     * passes the selected record to parent
+     * closes the results
+     */
     handleSelection(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -103,6 +89,41 @@ export default class CustomLookup extends LightningElement {
         e.preventDefault();
         e.stopPropagation();
         this.showResults = true;
+    }
+    handleSearchTermChange(e) {
+        let searchTerm = e.target.value;
+        console.log('mouseup' + searchTerm);
+        this.searchTerm = searchTerm;
+        if (this.timeOutVar) {
+            clearTimeout(this.timeOutVar);
+        }
+        this.__fetchResults = this.fetchResults.bind(this);
+        this.timeOutVar = setTimeout(
+            this.__fetchResults, 300);
+    }
+    fetchResults() {
+        console.log('fetch called');
+        if (this.searchTerm == '' || this.searchTerm == undefined) {
+            fetch({ 'query': this.formattedQuery, 'objectName': this.objectName })
+                .then(result => {
+                    console.log(result);
+                    let resultVar = JSON.parse(result);
+                    this.results = resultVar.returnValue.searchResults;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        } else if(this.searchTerm.length>1) {
+            search({ 'query': this.formattedQuery, 'objectName': this.objectName })
+                .then(result => {
+                    console.log(result);
+                    let resultVar = JSON.parse(result);
+                    this.results = resultVar.returnValue.searchResults;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
     }
 
 }
