@@ -16,6 +16,8 @@ export default class CustomLookup extends LightningElement {
     results;
     showResults;
     timeOutVar;
+    selectedId;
+    selectedName;
     /**
      * formats the results into a generic list 
      * with parameters like mainfieldtoshow and addnfieldtoshow
@@ -35,8 +37,15 @@ export default class CustomLookup extends LightningElement {
         }
         return false;
     }
+    get inputDivClass() {
+        return this.optionSelected ?
+            'slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right' :
+            'slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right';
+    }
     get searchResultDivClass() {
-        return this.showResults ? 'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open' : 'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click';
+        return this.showResults ?
+            'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open' :
+            'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click';
     }
     get formattedQuery() {
         if (this.searchTerm == undefined) {
@@ -49,7 +58,9 @@ export default class CustomLookup extends LightningElement {
             return 'FIND \'' + this.searchTerm + '\' IN ALL FIELDS RETURNING ' + this.objectName + '(Id,' + this.mainFieldToShow + ',' + this.addnFieldToShow + ' WHERE ' + this.whereClause + ')';
         }
     }
-
+    get optionSelected() {
+        return this.selectedId != undefined && this.selectedId != '' && this.selectedId != null;
+    }
     connectedCallback() {
         this.__mouseUpListener = this.mouseUpListener.bind(this);
         window.addEventListener('click', this.__mouseUpListener);
@@ -58,8 +69,7 @@ export default class CustomLookup extends LightningElement {
     }
     mouseUpListener() {
         console.log('logged in func');
-        if(this.timeOutVar)
-        {
+        if (this.timeOutVar) {
             clearTimeout(this.timeOutVar);
         }
         this.showResults = false;
@@ -75,11 +85,27 @@ export default class CustomLookup extends LightningElement {
         e.preventDefault();
         e.stopPropagation();
         let selectedId = e.currentTarget.getAttribute('data-id');
-        console.log(selectedId);
+        let selectedName = e.currentTarget.getAttribute('data-var');
+        
+        this.selectedId = selectedId;
+        this.selectedName = selectedName;
 
         let evt = new CustomEvent('lookupvalueselected', {
             detail: {
                 'selectedId': selectedId
+            }
+        });
+        this.dispatchEvent(evt);
+        this.showResults = false;
+    }
+    removeSelection(e)
+    {
+        e.preventDefault();
+        e.stopPropagation();
+        this.selectedId = null;
+        let evt = new CustomEvent('lookupvalueselected', {
+            detail: {
+                'selectedId': null
             }
         });
         this.dispatchEvent(evt);
@@ -113,7 +139,7 @@ export default class CustomLookup extends LightningElement {
                 .catch(error => {
                     console.log(error);
                 });
-        } else if(this.searchTerm.length>1) {
+        } else if (this.searchTerm.length > 1) {
             search({ 'query': this.formattedQuery, 'objectName': this.objectName })
                 .then(result => {
                     console.log(result);

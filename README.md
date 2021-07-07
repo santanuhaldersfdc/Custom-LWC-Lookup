@@ -16,8 +16,15 @@ This is a generic custom lookup component which can be used in any parent LWC co
 - **lookupvalueselected** : The child lookup component fires a CustomEvent called lookupvalueselected on selection of a search result by the user. Parent component should listen to this event.
 
 - **event parameters**
+when user selects a result
 ```
 detail: {
     selectedId: 0010o00002u7pLZAAY
+}
+```
+when user clears the selected value
+```
+detail: {
+    selectedId: null
 }
 ```
