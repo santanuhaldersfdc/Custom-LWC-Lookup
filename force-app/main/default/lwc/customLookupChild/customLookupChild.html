@@ -1,0 +1,123 @@
+<template>
+  <div class="slds-form-element">
+    <label class="slds-form-element__label" for="combobox-id-1"
+      >Relate To</label
+    >
+    <div class="slds-form-element__control">
+      <div class="slds-combobox_container">
+        <div
+          class={searchResultDivClass}
+          aria-expanded={isResultsAvailable}
+          aria-haspopup="listbox"
+          role="combobox"
+        >
+          <div
+            class="
+              slds-combobox__form-element
+              slds-input-has-icon slds-input-has-icon_right
+            "
+            role="none"
+          >
+            <input
+              type="text"
+              class="slds-input slds-combobox__input"
+              id="combobox-id-1"
+              aria-autocomplete="list"
+              aria-controls="listbox-id-1"
+              autocomplete="off"
+              role="textbox"
+              placeholder="Search..."
+              onclick={handleClickOnInput}
+            />
+            <span
+              class="
+                slds-icon_container
+                slds-icon-utility-search
+                slds-input__icon slds-input__icon_right
+              "
+            >
+              <svg
+                class="
+                  slds-icon slds-icon slds-icon_x-small
+                  slds-icon-text-default
+                "
+                aria-hidden="true"
+              >
+                <use
+                  xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"
+                ></use>
+              </svg>
+            </span>
+          </div>
+          <template if:true={showResults}>
+            <div
+              id="listbox-id-1"
+              class="
+                slds-dropdown
+                slds-dropdown_length-with-icon-7
+                slds-dropdown_fluid
+              "
+              role="listbox"
+            >
+              <ul
+                class="slds-listbox slds-listbox_vertical"
+                role="presentation"
+              >
+                <template for:each={resultsToShow} for:item="record">
+                  <li
+                    key={record.Id}
+                    role="presentation"
+                    class="slds-listbox__item"
+                    data-id={record.Id}
+                    onclick={handleSelection}
+                  >
+                    <div
+                      class="
+                        slds-media
+                        slds-listbox__option
+                        slds-listbox__option_entity
+                        slds-listbox__option_has-meta
+                      "
+                      role="option"
+                    >
+                      <span
+                        class="slds-media__figure slds-listbox__option-icon"
+                      >
+                        <span
+                          class="slds-icon_container slds-icon-standard-account"
+                        >
+                          <lightning-icon
+                            icon-name={iconName}
+                            alternative-text={objectName}
+                            title={objectName}
+                            size="small"
+                          ></lightning-icon>
+                        </span>
+                      </span>
+                      <span class="slds-media__body">
+                        <span
+                          class="
+                            slds-listbox__option-text
+                            slds-listbox__option-text_entity
+                          "
+                          >{record.mainFieldToShow}</span
+                        >
+                        <span
+                          class="
+                            slds-listbox__option-meta
+                            slds-listbox__option-meta_entity
+                          "
+                          >{record.addnFieldToShow}</span
+                        >
+                      </span>
+                    </div>
+                  </li>
+                </template>
+</ul>
+</div>
+</template>
+</div>
+</div>
+</div>
+</div>
+</template>
